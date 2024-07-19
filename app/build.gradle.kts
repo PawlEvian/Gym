@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.example.hw04_gymlog_v300"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.hw04_gymlog_v300"
         minSdk = 34
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
