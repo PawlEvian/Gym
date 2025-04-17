@@ -8,12 +8,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hw04_gymlog_v300.database.GymLogRepository;
+import com.example.hw04_gymlog_v300.database.entities.GymLog;
 import com.example.hw04_gymlog_v300.databinding.ActivityMainBinding;
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
+    private GymLogRepository repository;
     public static final String TAG = "TAC_GYMLOG";
     String mExercise = "";
     double mWeigh = 0.0;
@@ -27,20 +30,29 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
+        repository = GymLogRepository.getRepository(getApplication());
+
         binding.logButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getInformationFromDisplay();
+                insertGymLogRecord();
                 updateDisplay();
             }
         });
 
     }
 
+    public void insertGymLogRecord() {
+        GymLog log = new GymLog(mExercise, mWeigh, mReps);
+        repository.insertGymLog(log);
+    }
+
     private void updateDisplay() {
         String currentInfo= binding.LogDisplayTextView.getText().toString();
         String newDisplay = String.format(Locale.US, "Exercise:%s%nWeight:%.2f%nReps:%d%n=-=-=-=-=%n", mExercise, mWeigh, mReps);
         binding.LogDisplayTextView.setText(newDisplay);
+        Log.i(TAG, repository.getAllLogs().toString());
     }
 
     private void getInformationFromDisplay() {
