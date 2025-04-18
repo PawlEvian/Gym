@@ -1,6 +1,8 @@
 package com.example.hw04_gymlog_v300;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,12 +17,15 @@ import com.example.hw04_gymlog_v300.databinding.ActivityMainBinding;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    ActivityMainBinding binding;
+    private static final String MAIN_ACTIVITY_USER_ID = "com.example.hw04_gymlog_v300.MAIN_ACTIVITY_USER_ID";
+    private ActivityMainBinding binding;
     private GymLogRepository repository;
     public static final String TAG = "TAC_GYMLOG";
     String mExercise = "";
     double mWeigh = 0.0;
     int mReps = 0;
+
+    int loggedInUserId = -1;
 
 
     @Override
@@ -29,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
+
+        loginUser();
+
+        if (loggedInUserId == -1){
+            Intent intent = LoginActivity.loginIntentFactory(getApplicationContext());
+            startActivity(intent);
+        }
 
         repository = GymLogRepository.getRepository(getApplication());
 
@@ -41,6 +53,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void loginUser() {
+        //TODO
+        loggedInUserId = getIntent().getIntExtra(MAIN_ACTIVITY_USER_ID, -1);
+
+    }
+
+    static Intent mainActivityIntentFactory(Context context, int userId){
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(MAIN_ACTIVITY_USER_ID, userId);
+        return intent;
     }
 
     public void insertGymLogRecord() {
