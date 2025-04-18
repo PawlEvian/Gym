@@ -19,26 +19,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="42sp"
         android:gravity="center"/>
+
     <EditText
+        android:id="@+id/userNameLoginEditText"
         android:layout_width="match_parent"
         android:layout_height="85dp"
-        android:hint="@string/username"
-        app:layout_constraintBaseline_toBottomOf="@id/titleLoginTextView"
         android:layout_margin="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleLoginTextView"
         android:autofillHints="Please enter username"
         android:gravity="center"
-        android:textSize="24sp"
+        android:hint="@string/username"
         android:inputType="text"
-        android:id="@+id/userNameLoginEditText"
-        />
+        android:textSize="24sp"
+        app:layout_constraintBaseline_toBottomOf="@id/titleLoginTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleLoginTextView" />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:hint="@string/password"
-        app:layout_constraintBaseline_toBottomOf="@id/titleLoginTextView"
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
