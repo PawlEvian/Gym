@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hw04_gymlog_v300.database.GymLogRepository;
 import com.example.hw04_gymlog_v300.database.entities.GymLog;
+import com.example.hw04_gymlog_v300.database.entities.User;
 import com.example.hw04_gymlog_v300.databinding.ActivityMainBinding;
 
 import java.util.Locale;
@@ -25,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     double mWeigh = 0.0;
     int mReps = 0;
 
-    int loggedInUserId = -1;
+    private int loggedInUserId = -1;
+
+    private User user;
 
 
     @Override
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         loginUser();
+
+        invalidateOptionsMenu();
 
         if (loggedInUserId == -1){
             Intent intent = LoginActivity.loginIntentFactory(getApplicationContext());
@@ -49,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 getInformationFromDisplay();
                 insertGymLogRecord();
+                updateDisplay();
+            }
+        });
+
+        binding.exerciseInputEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 updateDisplay();
             }
         });
@@ -68,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void insertGymLogRecord() {
-        GymLog log = new GymLog(mExercise, mWeigh, mReps);
+        GymLog log = new GymLog(mExercise, mWeigh, mReps, loggedInUserId);
         repository.insertGymLog(log);
     }
 

@@ -83,7 +83,7 @@
         android:hint="@string/enter_reps"/>
     <Button
         android:layout_width="390dp"
-        android:layout_height="205dp"
+        android:layout_height="125dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/repInputEditText"
         app:layout_constraintEnd_toEndOf="parent"
