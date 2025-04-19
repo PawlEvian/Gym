@@ -24,4 +24,7 @@ public interface UserDAO {
 
     @Query("Delete from " + GymLogDatabase.USER_TABLE)
     void deleteAll();
+
+    @Query("Select * from " + GymLogDatabase.USER_TABLE + " WHERE username == :username")
+    User getUserByUsername(String username);
 }

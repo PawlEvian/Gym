@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Error reading value from Weight edit text");
         }
         try {
-            mReps = Integer.parseInt(binding.weightInputEditText.getText().toString());
+            mReps = Integer.parseInt(binding.repInputEditText.getText().toString());
         }catch (NumberFormatException e){
             Log.d(TAG, "Error reading value from Reps edit text");
         }
