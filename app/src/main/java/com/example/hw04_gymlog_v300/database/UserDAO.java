@@ -1,5 +1,6 @@
 package com.example.hw04_gymlog_v300.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -20,11 +21,11 @@ public interface UserDAO {
     void delete(User user);
 
     @Query("Select * from " + GymLogDatabase.USER_TABLE + " Order by username")
-    List<User> getAllUsers();
+    LiveData<List<User>> getAllUsers();
 
     @Query("Delete from " + GymLogDatabase.USER_TABLE)
     void deleteAll();
 
     @Query("Select * from " + GymLogDatabase.USER_TABLE + " WHERE username == :username")
-    User getUserByUsername(String username);
+    LiveData<User> getUserByUsername(String username);
 }
