@@ -40,6 +40,7 @@ public class GymLogRepository {
                     }
                 }
         );
+
         try{
             return future.get();
         } catch (InterruptedException | ExecutionException e) {

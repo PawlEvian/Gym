@@ -1,6 +1,5 @@
 package com.example.hw04_gymlog_v300;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private GymLogRepository repository;
     public static final String TAG = "TAC_GYMLOG";
-    String mExercise = "";
+    String mExercise = "default";
     double mWeigh = 0.0;
     int mReps = 0;
 
@@ -92,9 +91,6 @@ public class MainActivity extends AppCompatActivity {
         LiveData<User> userObserver = repository.getUserbyUserId(loggedInUserId);
         userObserver.observe(this, user -> {
             if (user != null){
-                return;
-            }
-            else{
                 invalidateOptionsMenu();
             }
         });

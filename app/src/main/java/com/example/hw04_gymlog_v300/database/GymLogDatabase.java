@@ -1,6 +1,7 @@
 package com.example.hw04_gymlog_v300.database;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -9,6 +10,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.hw04_gymlog_v300.MainActivity;
 import com.example.hw04_gymlog_v300.database.entities.GymLog;
 import com.example.hw04_gymlog_v300.database.entities.User;
 import com.example.hw04_gymlog_v300.database.typeConverters.LocalDateTypeConverter;
@@ -45,8 +47,10 @@ public abstract class GymLogDatabase extends RoomDatabase {
     }
 
     private static final RoomDatabase.Callback addDefaultValues = new RoomDatabase.Callback(){
-        public void OnCreate(@NonNull SupportSQLiteDatabase db){
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
+            Log.i(MainActivity.TAG, "DATABASE CREATED!");
             databaseWriteExecutor.execute(() ->{
                 UserDAO dao = INSTANCE.userDAO();
                 dao.deleteAll();
