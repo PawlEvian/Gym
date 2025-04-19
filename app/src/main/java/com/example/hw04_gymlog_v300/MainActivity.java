@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 
 import com.example.hw04_gymlog_v300.database.GymLogRepository;
 import com.example.hw04_gymlog_v300.database.entities.GymLog;
@@ -55,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        invalidateOptionsMenu();
-
         repository = GymLogRepository.getRepository(getApplication());
 
         binding.logButton.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +86,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         loggedInUserId = getIntent().getIntExtra(MAIN_ACTIVITY_USER_ID, LOGGED_OUT);
+        if (loggedInUserId == LOGGED_OUT){
+            return;
+        }
+        LiveData<User> userObserver = repository.getUserbyUserId(loggedInUserId);
+        userObserver.observe(this, user -> {
+            if (user != null){
+                return;
+            }
+            else{
+                invalidateOptionsMenu();
+            }
+        });
 
     }
     @Override
@@ -100,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.logoutMenuItem);
         item.setVisible(true);
+        if (user == null){
+            return false;
+        }
         item.setTitle(user.getUsername());
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
