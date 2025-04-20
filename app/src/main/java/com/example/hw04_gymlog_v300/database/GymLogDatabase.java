@@ -35,6 +35,7 @@ public abstract class GymLogDatabase extends RoomDatabase {
         if (INSTANCE == null){
             synchronized (GymLogDatabase.class){
                 if (INSTANCE == null){
+                    Log.d(MainActivity.TAG, "database creation");
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             GymLogDatabase.class, DATABASE_NAME)
                             .fallbackToDestructiveMigration()
@@ -50,7 +51,7 @@ public abstract class GymLogDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            Log.i(MainActivity.TAG, "DATABASE CREATED!");
+            Log.d(MainActivity.TAG, "DATABASE CREATED!");
             databaseWriteExecutor.execute(() ->{
                 UserDAO dao = INSTANCE.userDAO();
                 dao.deleteAll();
@@ -59,6 +60,7 @@ public abstract class GymLogDatabase extends RoomDatabase {
                 dao.insert(admin);
                 User testuser1 = new User("testuser1", "testuser1");
                 dao.insert(testuser1);
+                Log.d(MainActivity.TAG, "db created");
             });
         }
     };
