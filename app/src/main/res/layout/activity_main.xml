@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/LogDisplayTextView"
-        android:layout_width="390dp"
+        android:layout_width="350dp"
         android:layout_height="200dp"
         android:layout_marginTop="16dip"
         android:text="Hello World!"

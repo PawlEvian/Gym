@@ -6,12 +6,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,17 +22,16 @@ import com.example.hw04_gymlog_v300.database.entities.GymLog;
 import com.example.hw04_gymlog_v300.database.entities.User;
 import com.example.hw04_gymlog_v300.databinding.ActivityMainBinding;
 
-import java.util.Locale;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String MAIN_ACTIVITY_USER_ID = "com.example.hw04_gymlog_v300.MAIN_ACTIVITY_USER_ID";
-    static final String SHARED_PREFERENCE_USERID_KEY = "com.example.hw04_gymlog_v300.SHARED_PREFERENCE_USERID_KEY";
     private static final int LOGGED_OUT = -1;
-    private static final String SHARED_PREFERENCE_USERID_VALUE = "com.example.hw04_gymlog_v300.SHARED_PREFERENCE_USERID_VALUE";
+    private static final String SAVE_INSTANCE_STATE_USERID_KEY = "com.example.hw04_gymlog_v300.SAVE_INSTANCE_STATE_USERID_KEY";
     private ActivityMainBinding binding;
     private GymLogRepository repository;
     public static final String TAG = "TAC_GYMLOG";
-    String mExercise = "default";
+    String mExercise = "";
     double mWeigh = 0.0;
     int mReps = 0;
 
@@ -47,15 +46,19 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
+        repository = GymLogRepository.getRepository(getApplication());
 
-        loginUser();
+        loginUser(savedInstanceState);
 
-        if (loggedInUserId == -1){
+        //user not logged in at this point, gt login screen
+        if (loggedInUserId == LOGGED_OUT){
             Intent intent = LoginActivity.loginIntentFactory(getApplicationContext());
             startActivity(intent);
         }
+        updateSharedPreference();
 
-        repository = GymLogRepository.getRepository(getApplication());
+        binding.LogDisplayTextView.setMovementMethod(new ScrollingMovementMethod());
+        updateDisplay();
 
         binding.logButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,36 +68,41 @@ public class MainActivity extends AppCompatActivity {
                 updateDisplay();
             }
         });
-
-        binding.exerciseInputEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateDisplay();
-            }
-        });
+        Log.d(TAG, "TextView = " + binding.LogDisplayTextView);
 
     }
 
-    private void loginUser() {
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFERENCE_USERID_KEY,
+    private void loginUser(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
 
-        loggedInUserId = sharedPreferences.getInt(SHARED_PREFERENCE_USERID_VALUE, LOGGED_OUT);
-        if (loggedInUserId != LOGGED_OUT){
-            return;
-        }
+        loggedInUserId = sharedPreferences.getInt(getString(R.string.preference_userid_key), LOGGED_OUT);
 
-        loggedInUserId = getIntent().getIntExtra(MAIN_ACTIVITY_USER_ID, LOGGED_OUT);
+
+        if (loggedInUserId == LOGGED_OUT & savedInstanceState != null && savedInstanceState.containsKey(SAVE_INSTANCE_STATE_USERID_KEY)){
+            loggedInUserId = savedInstanceState.getInt(SAVE_INSTANCE_STATE_USERID_KEY);
+        }
+        if (loggedInUserId == LOGGED_OUT){
+            loggedInUserId = getIntent().getIntExtra(MAIN_ACTIVITY_USER_ID, LOGGED_OUT);
+        }
         if (loggedInUserId == LOGGED_OUT){
             return;
         }
         LiveData<User> userObserver = repository.getUserbyUserId(loggedInUserId);
         userObserver.observe(this, user -> {
+            this.user = user;
             if (user != null){
                 invalidateOptionsMenu();
             }
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outstate){
+        super.onSaveInstanceState(outstate);
+        outstate.putInt(SAVE_INSTANCE_STATE_USERID_KEY, loggedInUserId);
+        updateSharedPreference();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -114,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
-                Toast.makeText(MainActivity.this, "Logout to be implemented", Toast.LENGTH_SHORT).show();
                 showLogoutDialog();
                 return false;
             }
@@ -145,12 +152,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFERENCE_USERID_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor sharedPrefEditor= sharedPreferences.edit();
-        sharedPrefEditor.putInt(SHARED_PREFERENCE_USERID_KEY, LOGGED_OUT);
-        sharedPrefEditor.apply();
+        loggedInUserId = LOGGED_OUT;
+        updateSharedPreference();
         getIntent().putExtra(MAIN_ACTIVITY_USER_ID, LOGGED_OUT);
         startActivity(LoginActivity.loginIntentFactory(getApplicationContext()));
+    }
+
+    private void updateSharedPreference() {
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefEditor= sharedPreferences.edit();
+        sharedPrefEditor.putInt(getString(R.string.preference_userid_key), loggedInUserId);
+        sharedPrefEditor.apply();
     }
 
     static Intent mainActivityIntentFactory(Context context, int userId){
@@ -165,10 +177,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDisplay() {
-        String currentInfo= binding.LogDisplayTextView.getText().toString();
-        String newDisplay = String.format(Locale.US, "Exercise:%s\nWeight:%.2f\nReps:%d\n=-=-=-=-=\n", mExercise, mWeigh, mReps);
-        binding.LogDisplayTextView.setText(newDisplay);
-        Log.i(TAG, repository.getAllLogs().toString());
+        ArrayList<GymLog> allLogs = repository.getAllLogsByUserID(loggedInUserId);
+        if (allLogs.isEmpty()){
+            binding.LogDisplayTextView.setText(R.string.time_to_hit_the_gym);
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (GymLog log : allLogs){
+            sb.append(log);
+        }
+        binding.LogDisplayTextView.setText(sb.toString());
     }
 
     private void getInformationFromDisplay() {

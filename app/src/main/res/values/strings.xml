@@ -11,4 +11,7 @@
     <string name="username">Username</string>
     <string name="password">password</string>
     <string name="login">Login!</string>
+    <string name="time_to_hit_the_gym">time to hit the gym</string>
+    <string name="preference_file_key">PreferenceFilename</string>
+    <string name="preference_userid_key">PreferenceUserIdKey</string>
 </resources>
